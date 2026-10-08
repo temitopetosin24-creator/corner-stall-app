@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Corner Stall Admin</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;600;800&display=swap">
+<style>
+:root{--ink:#1c2541;--paper:#eef2f8;--card:#fff;--line:#d5dcea;--sun:#f4b400;--sale:#d6452b;--ok:#1f7a4d;
+font-family:"Bricolage Grotesque",system-ui,sans-serif;color:var(--ink);background:var(--paper)}
+*{box-sizing:border-box}[hidden]{display:none!important}
+body{margin:0}
+header{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 20px;background:var(--ink);color:#fff;position:sticky;top:0;z-index:5}
+header h1{margin:0;font-size:1.4rem;font-weight:800;letter-spacing:-.02em}
+main{max-width:1100px;margin:0 auto;padding:24px 20px 60px}
+button,input,select{font:inherit}
+button{cursor:pointer;border:0;border-radius:8px;padding:10px 16px;font-weight:600;background:var(--sun);color:var(--ink)}
+button.ghost{background:transparent;color:inherit;border:1.5px solid currentColor}
+button.danger{background:var(--sale);color:#fff}
+a.btn{display:inline-block;padding:10px 16px;border-radius:8px;font-weight:600;background:var(--sun);color:var(--ink);text-decoration:none}
+button:focus-visible,input:focus-visible{outline:3px solid var(--sun);outline-offset:2px}
+button:disabled{opacity:.6;cursor:wait}
+input{width:100%;padding:10px;border:1.5px solid var(--line);border-radius:8px;background:#fff}
+label{display:block;font-size:.85rem;font-weight:600;margin:12px 0 4px}
+.msg{min-height:1.4em;margin:12px 0;font-weight:600}.msg.err{color:var(--sale)}.msg.ok{color:var(--ok)}
+.hero{font-size:clamp(1.8rem,5vw,3rem);font-weight:800;letter-spacing:-.03em;margin:8px 0 4px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:18px;margin-top:20px}
+.item{background:var(--card);border-radius:12px;padding:12px;border:1px solid var(--line)}
+.pic{position:relative;aspect-ratio:1;border-radius:8px;background:#e3e9f4;display:grid;place-items:center;font-size:4rem;overflow:hidden}
+.pic img{width:100%;height:100%;object-fit:cover}
+.badge{position:absolute;top:8px;left:8px;background:var(--sale);color:#fff;font-size:.7rem;padding:3px 8px;border-radius:6px}
+.item h3{margin:10px 0 2px;font-size:1rem}.cat{margin:0;color:#5b6786;font-size:.85rem}
+.price{margin:6px 0 0;font-weight:800;font-size:1.1rem}.price s{font-weight:400;color:#7d88a3;font-size:.85rem}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:20px}
+.login{max-width:380px;margin:40px auto}
+.admin{display:grid;grid-template-columns:minmax(260px,340px) 1fr;gap:20px;align-items:start}
+.row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line)}
+.row .t{flex:1;min-width:0}.row .t b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.row .e{font-size:1.6rem}.row button{padding:6px 10px;font-size:.85rem}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:760px){.admin{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header>
+  <h1>Corner Stall Admin</h1>
+  <div>
+    <a class="btn" href="index.html">View shop</a>
+    <button id="logout" class="ghost" hidden>Log out</button>
+  </div>
+</header>
+
+<main>
+  <section id="loginView">
+    <form id="loginForm" class="panel login">
+      <h2>Seller login</h2>
+      <label for="pw">Admin password</label>
+      <input id="pw" type="password" autocomplete="current-password" required>
+      <p id="loginMsg" class="msg" role="alert"></p>
+      <button id="loginBtn" type="submit">Open dashboard</button>
+    </form>
+  </section>
+
+  <section id="adminView" hidden>
+    <div class="admin">
+      <form id="form" class="panel">
+        <h2 id="formTitle">Add product</h2>
+        <input type="hidden" name="id"><input type="hidden" name="rating"><input type="hidden" name="reviews">
+        <label for="f-name">Name</label><input id="f-name" name="name" required maxlength="100">
+        <label for="f-cat">Category</label><input id="f-cat" name="category" required maxlength="50" list="cats">
+        <datalist id="cats"><option>Bags<option>Shoes<option>Clothes<option>Lunch boxes</datalist>
+        <div class="two">
+          <div><label for="f-price">Price (₦)</label><input id="f-price" name="price" type="number" min="1" required></div>
+          <div><label for="f-old">Old price</label><input id="f-old" name="oldPrice" type="number" min="0"></div>
+        </div>
+        <div class="two">
+          <div><label for="f-badge">Badge</label><input id="f-badge" name="badge" maxlength="20" placeholder="SALE"></div>
+          <div><label for="f-emoji">Emoji</label><input id="f-emoji" name="emoji" maxlength="8" placeholder="🎒"></div>
+        </div>
+        <label for="photo">Photo (optional)</label><input id="photo" type="file" accept="image/*">
+        <label><input id="rmimg" type="checkbox" style="width:auto"> Remove current photo</label>
+        <p id="adminMsg" class="msg" role="status"></p>
+        <button id="saveBtn" type="submit">Save product</button>
+        <button id="clearBtn" type="button" class="ghost">New product</button>
+      </form>
+      <div class="panel"><h2>Products</h2><div id="list"></div></div>
+    </div>
+  </section>
+</main>
+
+<script>
+// 1. Paste your Apps Script web app URL (the one ending in /exec)
+const API_URL = "https://script.google.com/macros/s/AKfycbyTdrqcRWfE2FvjrlUYcWt5_KzBnR15F3ddsNBKQWL943YyqqNkLhnJgk-jmG9wjrLH/exec";
+
+const $ = id => document.getElementById(id);
+const money = n => "₦" + Number(n).toLocaleString("en-NG");
+const esc = s => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+let products = [], password = "";
+
+function show(view) {
+  for (const v of ["login", "admin"]) $(v + "View").hidden = v !== view;
+  $("logout").hidden = view !== "admin";
+  window.scrollTo(0, 0);
+  if (view === "login") $("pw").focus();
+}
+function say(id, text, kind) { const el = $(id); el.textContent = text; el.className = "msg " + (kind || ""); }
+
+// One helper for every call to Apps Script. No custom headers, so the browser skips the CORS preflight.
+async function call(payload) {
+  const ctl = new AbortController();
+  const timer = setTimeout(() => ctl.abort(), 30000);
+  try {
+    const res = await fetch(API_URL, payload
+      ? { method: "POST", body: JSON.stringify(payload), signal: ctl.signal }
+      : { signal: ctl.signal });
+    const data = await res.json();
+    if (!data.ok) throw new Error(data.error || "Request failed.");
+    return data.products;
+  } catch (e) {
+    if (e.name === "AbortError") throw new Error("The server took too long. Try again.");
+    if (e instanceof SyntaxError) throw new Error("Google sent a page instead of data. Set the deployment access to Anyone.");
+    if (e instanceof TypeError) throw new Error("Could not reach Apps Script. Check the /exec URL and the deployment access.");
+    throw e;
+  } finally { clearTimeout(timer); }
+}
+
+function renderAdmin() {
+  $("list").innerHTML = products.map(p => `
+    <div class="row"><span class="e">${esc(p.emoji)}</span>
+      <div class="t"><b>${esc(p.name)}</b><small>${esc(p.category)} · ${money(p.price)}</small></div>
+      <button data-edit="${esc(p.id)}">Edit</button>
+      <button data-del="${esc(p.id)}" class="danger">Delete</button></div>`).join("") || "<p>No products yet.</p>";
+}
+
+function resetForm() {
+  $("form").reset();
+  $("form").elements.id.value = "";
+  $("formTitle").textContent = "Add product";
+}
+
+function compress(file) {
+  return new Promise((resolve, reject) => {
+    const img = new Image(), url = URL.createObjectURL(file);
+    img.onload = () => {
+      const s = Math.min(1, 800 / Math.max(img.width, img.height));
+      const c = document.createElement("canvas");
+      c.width = Math.round(img.width * s); c.height = Math.round(img.height * s);
+      c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+      URL.revokeObjectURL(url);
+      resolve(c.toDataURL("image/jpeg", 0.75));
+    };
+    img.onerror = () => reject(new Error("Could not read that image."));
+    img.src = url;
+  });
+}
+
+$("logout").onclick = () => { password = ""; $("pw").value = ""; show("login"); };
+
+$("loginForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  $("loginBtn").disabled = true; say("loginMsg", "Checking…");
+  try {
+    products = await call({ action: "login", password: $("pw").value });
+    password = $("pw").value; $("pw").value = "";
+    renderAdmin(); resetForm(); say("adminMsg", ""); show("admin");
+  } catch (err) { say("loginMsg", err.message, "err"); }
+  $("loginBtn").disabled = false;
+});
+
+$("form").addEventListener("submit", async e => {
+  e.preventDefault();
+  $("saveBtn").disabled = true; say("adminMsg", "Saving…");
+  try {
+    const product = Object.fromEntries(new FormData(e.target));
+    const file = $("photo").files[0];
+    products = await call({
+      action: "save", password, product,
+      imageDataUrl: file ? await compress(file) : "",
+      removeImage: $("rmimg").checked
+    });
+    renderAdmin(); resetForm(); say("adminMsg", "Saved.", "ok");
+  } catch (err) { say("adminMsg", err.message, "err"); }
+  $("saveBtn").disabled = false;
+});
+$("clearBtn").onclick = resetForm;
+
+$("list").addEventListener("click", async e => {
+  const editId = e.target.dataset.edit, delId = e.target.dataset.del;
+  if (editId) {
+    const p = products.find(x => x.id === editId), f = $("form").elements;
+    for (const k of ["id", "name", "category", "price", "oldPrice", "badge", "emoji", "rating", "reviews"]) f[k].value = p[k] ?? "";
+    $("formTitle").textContent = "Edit product"; say("adminMsg", ""); window.scrollTo(0, 0);
+  } else if (delId && confirm("Delete this product?")) {
+    try { products = await call({ action: "delete", password, id: delId }); renderAdmin(); say("adminMsg", "Deleted.", "ok"); }
+    catch (err) { say("adminMsg", err.message, "err"); }
+  }
+});
+
+</script>
+</body>
+</html>
